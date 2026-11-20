@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+NAME="pokecode"
+VERSION="2.1.0"
+ROOT_DIR="/opt/pokecode"
+LIB_DIR="$ROOT_DIR/lib"
+SERVER="$LIB_DIR/server.js"
+PORT="${POKECODE_PORT:-8765}"
+WORKSPACE="${POKECODE_WORKSPACE:-$HOME/.pokecode/projects}"
+mkdir -p "$WORKSPACE"
+
+usage() {
+  cat <<EOF
+$NAME v$VERSION — PokeCode IDE for Linux (Ubuntu)
+
+Commands:
+  ide      Start the graphical IDE (default)
+  cli      Interactive shell
+  sync     Sync projects (mobile -> PC)
+  new <n>  New project
+  run <..> Run command in workspace
+  version
+  help
+
+Environment:
+  POKECODE_PORT        IDE port (default 8765)
+  POKECODE_WORKSPACE   Workspace (default ~/.pokecode/projects)
+EOF
+}
+cmd_version() { echo "$NAME $VERSION"; }
+cmd_new() { local n="${1:-}"; [[ -z "$n" ]] && { echo "$NAME: missing name" >&2; exit 2; }; local d="$WORKSPACE/$n"; [[ -e "$d" ]] && { echo "$NAME: exists: $d" >&2; exit 1; }; mkdir -p "$d"; echo "# $n" > "$d/README.md"; echo "Created: $d"; }
+cmd_run() { [[ $# -eq 0 ]] && { echo "$NAME: missing cmd" >&2; exit 2; }; cd "$WORKSPACE"; exec "$@"; }
+cmd_sync() { if [[ -f "$ROOT_DIR/lib/sync/index.js" ]]; then node "$ROOT_DIR/lib/sync/index.js" "$@"; else echo "$NAME: sync module missing" >&2; exit 1; fi; }
+interactive_cli() {
+  echo "$NAME CLI v$VERSION (workspace: $WORKSPACE)"
+  while true; do
+    printf "pokecode> "
+    read -r line || { echo; break; }
+    case "$line" in
+      "" ) continue ;;
+      help ) usage ;;
+      version ) cmd_version ;;
+      exit|quit ) break ;;
+      new*) cmd_new ${line#new } ;;
+      run*) cmd_run ${line#run } ;;
+      sync*) cmd_sync ${line#sync } ;;
+      *) ( cd "$WORKSPACE" && bash -c "$line" ) || true ;;
+    esac
+  done
+}
+cmd_ide() {
+  export POKECODE_WORKSPACE="$WORKSPACE" POKECODE_PORT="$PORT"
+  if ! command -v node >/dev/null 2>&1; then echo "$NAME: node missing" >&2; exit 1; fi
+  echo "$NAME: starting IDE on http://127.0.0.1:$PORT"
+  if command -v xdg-open >/dev/null 2>&1; then (sleep 2 && xdg-open "http://127.0.0.1:$PORT" >/dev/null 2>&1 &); fi
+  exec node "$SERVER"
+}
+main() {
+  case "${1:-ide}" in
+    ide) shift || true; cmd_ide ;;
+    cli) shift || true; interactive_cli ;;
+    sync) shift; cmd_sync "$@" ;;
+    new) shift; cmd_new "${1:-}" ;;
+    run) shift; cmd_run "$@" ;;
+    version|--version|-v) cmd_version ;;
+    help|--help|-h) usage ;;
+    *) echo "$NAME: unknown: $1" >&2; usage >&2; exit 2 ;;
+  esac
+}
+main "$@"

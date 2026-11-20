@@ -1,10 +1,10 @@
 #!/bin/sh
 set -e
-# Create application data directory
 mkdir -p /usr/share/pokecode
-# Update desktop database if available
+if command -v npm >/dev/null 2>&1 && [ ! -d /opt/pokecode/node_modules ]; then
+  (cd /opt/pokecode && npm install --omit=dev --no-audit --no-fund --no-bin-links 2>/dev/null || true)
+fi
 if command -v update-desktop-database >/dev/null 2>&1; then
-    update-desktop-database /usr/share/applications || true
+  update-desktop-database /usr/share/applications || true
 fi
 exit 0
-EOF

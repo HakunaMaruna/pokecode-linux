@@ -1,0 +1,21 @@
+{
+  "name": "pokecode",
+  "version": "2.1.0",
+  "description": "PokeCode IDE for Linux (Ubuntu) — full port: IDE, agent, terminal, git, db, sync",
+  "main": "lib/server.js",
+  "bin": { "pokecode": "bin/pokecode" },
+  "scripts": {
+    "start": "node lib/server.js",
+    "ide": "node lib/server.js",
+    "sync": "node lib/sync/index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5",
+    "cors": "^2.8.5",
+    "pg": "^8.11.5",
+    "simple-git": "^3.24.0"
+  },
+  "engines": { "node": ">=18.0.0" },
+  "license": "MIT"
+}
