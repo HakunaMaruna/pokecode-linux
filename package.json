@@ -1,6 +1,6 @@
 {
   "name": "pokecode",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "PokeCode IDE for Linux (Ubuntu) — full port: IDE, agent, terminal, git, db, sync",
   "main": "lib/server.js",
   "bin": { "pokecode": "bin/pokecode" },

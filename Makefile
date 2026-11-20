@@ -1,5 +1,5 @@
 PACKAGE := pokecode
-VERSION := 2.1.0
+VERSION := 2.1.1
 ARCH := all
 DEB := $(PACKAGE)_$(VERSION)_$(ARCH).deb
 BUILD_DIR := build/app
