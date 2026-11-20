@@ -1,55 +1,31 @@
-# PokeCode Linux
+# PokeCode IDE
 
-Linux (Ubuntu) port of the **PokeCode Android IDE**.
+Полноценная IDE для Linux, созданная на базе Electron. Это мощный инструмент для разработки с интегрированным терминалом, AI-агентом и поддержкой Git.
 
-PokeCode is a professional Android IDE. This repository provides a Linux/Ubuntu
-porting effort: a native launcher, Debian packaging and documentation so that
-PokeCode can be installed and used on Ubuntu systems.
+## Основные возможности
+- **Редактор кода:** Monaco Editor (движок VS Code) с поддержкой подсветки синтаксиса.
+- **Терминал:** Интегрированный системный bash-терминал.
+- **AI-агент:** Встроенный чат с OpenCode для помощи в написании кода.
+- **Файловая система:** Полноценный доступ к файлам вашего проекта.
+- **Git-интеграция:** Базовая поддержка команд Git.
 
-> PokeCode itself is proprietary. This project contains only the Linux porting
-> glue, packaging and documentation; it does not redistribute PokeCode's
-> proprietary source.
+## Установка
+1. Скачайте последнюю версию .deb пакета со страницы [Releases](https://github.com/HakunaMaruna/pokecode-linux/releases).
+2. Установите пакет:
+   ```bash
+   sudo dpkg -i pokecode_*.deb
+   sudo apt-get install -f
+   ```
+3. Запустите программу через меню приложений или команду `pokecode`.
 
-## Features
+## Разработка и сборка
+Для сборки приложения из исходников:
+1. Установите зависимости: `npm install`
+2. Запустите сборку: `npm run build`
+   Файл .deb будет создан в папке `dist/`.
 
-- `pokecode` command-line launcher
-- Project workspace management (`pokecode new`, `pokecode run`)
-- Debian/Ubuntu `.deb` package
-- Desktop entry for application menus
-- Installation and build documentation
-
-## Download
-
-- [.deb (v1.0.0)](https://github.com/HakunaMaruna/pokecode-linux/releases/download/v1.0.0/pokecode_1.0.0_all.deb)
-
-## Download
-
-- [.deb v2.0.0](https://github.com/HakunaMaruna/pokecode-linux/releases/download/v2.0.0/pokecode_2.0.0_all.deb)
-
-## Quick start
-
-```bash
-# Build the .deb package
-make deb
-
-# Install on Ubuntu/Debian
-sudo dpkg -i pokecode_1.0.0_all.deb
-sudo apt-get install -f   # resolve dependencies if needed
-
-# Run
-pokecode
-```
-
-## Documentation
-
-- [Installation](docs/INSTALL.md)
-- [Building](docs/BUILD.md)
-- [Porting notes](docs/PORTING.md)
-- [User guide](docs/USER_GUIDE.md)
-
-## License
-
-The porting glue and packaging in this repository are released under the MIT
-license. PokeCode and its components remain the property of their respective
-owners.
-EOF
+## Технический стек
+- **Electron:** Основной каркас приложения.
+- **Monaco Editor:** Редактор кода.
+- **xterm.js:** Терминал.
+- **OpenCode:** AI-агент.
