@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=PokeCode
+Comment=Linux port of the PokeCode Android IDE
+Exec=pokecode
+Icon=pokecode
+Terminal=true
+Categories=Development;IDE;
+Keywords=pokecode;ide;code;
+EOF

@@ -1,0 +1,21 @@
+name: Build deb
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-deb:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build package
+        run: make deb
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pokecode-deb
+          path: "*.deb"
+EOF

@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PKG_NAME="pokecode"
+PKG_VERSION="2.0.0"
+INSTALL_DIR="/usr/share/pokecode"
+APP_HOME="${POKECODE_HOME:-$HOME/.pokecode}"
+WORKSPACE="${POKECODE_WORKSPACE:-$PWD}"
+PORT="${POKECODE_PORT:-8765}"
+
+usage() {
+    cat <<EOF
+Usage: pokecode [command] [options]
+
+Commands:
+  ide (default)   Start the PokeCode web IDE
+  cli             Interactive command-line shell
+  new <name>      Create a new project directory
+  run <cmd...>    Run a command in the workspace
+  version         Print version
+  help            Show this help
+
+Environment:
+  POKECODE_HOME        Data directory (default: ~/.pokecode)
+  POKECODE_WORKSPACE   Workspace directory (default: current directory)
+  POKECODE_PORT        IDE port (default: 8765)
+EOF
+}
+
+ensure_home() { mkdir -p "$APP_HOME" "$APP_HOME/projects"; }
+
+cmd_version() { echo "$PKG_NAME $PKG_VERSION"; }
+
+cmd_new() {
+    local name="${1:-}"
+    [[ -z "$name" ]] && { echo "pokecode: missing project name" >&2; exit 2; }
+    ensure_home
+    local dir="$APP_HOME/projects/$name"
+    [[ -e "$dir" ]] && { echo "pokecode: exists: $dir" >&2; exit 1; }
+    mkdir -p "$dir"
+    printf '# %s\n\nCreated by PokeCode IDE.\n' "$name" > "$dir/README.md"
+    echo "Created project: $dir"
+}
+
+cmd_run() {
+    [[ $# -eq 0 ]] && { echo "pokecode: missing command" >&2; exit 2; }
+    ensure_home
+    cd "$WORKSPACE"
+    exec "$@"
+}
+
+interactive_cli() {
+    ensure_home
+    echo "PokeCode CLI $PKG_VERSION  (workspace: $WORKSPACE)"
+    while true; do
+        printf "pokecode> "
+        read -r line || { echo; break; }
+        case "$line" in
+            "" ) continue ;;
+            help ) usage ;;
+            version ) cmd_version ;;
+            exit|quit ) break ;;
+            new* ) cmd_new ${line#new } ;;
+            run* ) cmd_run ${line#run } ;;
+            * ) ( cd "$WORKSPACE" && bash -c "$line" ) || true ;;
+        esac
+    done
+}
+
+cmd_ide() {
+    ensure_home
+    export POKECODE_WORKSPACE="$WORKSPACE"
+    export POKECODE_PORT="$PORT"
+    if [[ -f "$INSTALL_DIR/lib/server.py" ]]; then
+        exec python3 "$INSTALL_DIR/lib/server.py"
+    elif [[ -f "$(dirname "$0")/../lib/server.py" ]]; then
+        exec python3 "$(dirname "$0")/../lib/server.py"
+    else
+        echo "pokecode: server not found" >&2
+        exit 1
+    fi
+}
+
+main() {
+    case "${1:-ide}" in
+        ide ) shift || true; cmd_ide ;;
+        cli ) shift || true; interactive_cli ;;
+        new ) shift; cmd_new "${1:-}" ;;
+        run ) shift; cmd_run "$@" ;;
+        version|--version|-v ) cmd_version ;;
+        help|--help|-h ) usage ;;
+        * ) echo "pokecode: unknown command: $1" >&2; usage >&2; exit 2 ;;
+    esac
+}
+
+main "$@"
+EOF
+echo done

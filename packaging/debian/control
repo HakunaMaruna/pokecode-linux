@@ -1,0 +1,10 @@
+Package: pokecode
+Version: 2.0.0
+Section: devel
+Priority: optional
+Architecture: all
+Maintainer: HakunaMaruna <pocketcode@users.noreply.github.com>
+Depends: python3, xdg-utils
+Description: PokeCode IDE for Linux (Ubuntu)
+ Web-based IDE with Monaco editor, file tree and code runner.
+ Homepage: https://github.com/HakunaMaruna/pokecode-linux
